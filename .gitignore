@@ -229,3 +229,7 @@ client/.turbo/
 client/.vercel
 client/.env*.local
 client/*.tsbuildinfo
+
+
+# Large raw dataset archives
+mediq_data/

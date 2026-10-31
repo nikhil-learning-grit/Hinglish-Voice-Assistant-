@@ -176,7 +176,23 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
             "data": topic_map[topic_clean],
         }
 
-    # 2. Search through hospital.json FAQs
+    # 2. Check for high-confidence / phrase match in enhanced hospital FAQ dataset (derived from MEDIQ)
+    enhanced_matches = _match_enhanced_faq(topic_clean)
+    exact_or_high_conf = [
+        m for m in enhanced_matches
+        if topic_clean in m.get("question", "").lower() or m.get("question", "").lower() in topic_clean
+    ]
+    if exact_or_high_conf:
+        return {
+            "success": True,
+            "message": (
+                f"Found {len(exact_or_high_conf)} matching administrative record(s) "
+                f"for '{topic.strip()}' in hospital knowledge base."
+            ),
+            "data": exact_or_high_conf if len(exact_or_high_conf) > 1 else exact_or_high_conf[0],
+        }
+
+    # 3. Search through hospital.json FAQs
     faqs = _hospital_data.get("faqs", [])
     matched_faqs = []
     for faq in faqs:
@@ -199,8 +215,7 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
             "data": matched_faqs if len(matched_faqs) > 1 else matched_faqs[0],
         }
 
-    # 3. Dynamic search in enhanced hospital FAQ dataset (derived from MEDIQ)
-    enhanced_matches = _match_enhanced_faq(topic_clean)
+    # 4. Secondary dynamic search in enhanced hospital FAQ dataset (derived from MEDIQ)
     if enhanced_matches:
         return {
             "success": True,
