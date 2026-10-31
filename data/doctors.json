@@ -1,0 +1,104 @@
+[
+  {
+    "doctor_id": "DOC001",
+    "name": "Dr. Rajesh Sharma",
+    "specialization": "General Medicine",
+    "qualification": "MBBS, MD (Internal Medicine)",
+    "experience_years": 14,
+    "department_id": "DEP-GEN",
+    "consultation_fee": 600,
+    "room_number": "Room 102, Block A",
+    "languages": [
+      "Hindi",
+      "English"
+    ],
+    "available_dates": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-04"
+    ],
+    "available_time_slots": [
+      "09:00 AM",
+      "10:00 AM",
+      "11:30 AM",
+      "02:00 PM"
+    ]
+  },
+  {
+    "doctor_id": "DOC002",
+    "name": "Dr. Priya Patel",
+    "specialization": "Cardiology",
+    "qualification": "MBBS, MD, DM (Cardiology)",
+    "experience_years": 12,
+    "department_id": "DEP-CARD",
+    "consultation_fee": 1000,
+    "room_number": "Room 205, Block B",
+    "languages": [
+      "Hindi",
+      "English",
+      "Gujarati"
+    ],
+    "available_dates": [
+      "2026-11-02",
+      "2026-11-04",
+      "2026-11-05"
+    ],
+    "available_time_slots": [
+      "10:30 AM",
+      "12:00 PM",
+      "03:00 PM",
+      "04:30 PM"
+    ]
+  },
+  {
+    "doctor_id": "DOC003",
+    "name": "Dr. Amit Verma",
+    "specialization": "Orthopedics",
+    "qualification": "MBBS, MS (Orthopaedics)",
+    "experience_years": 10,
+    "department_id": "DEP-ORTH",
+    "consultation_fee": 800,
+    "room_number": "Room 108, Block B",
+    "languages": [
+      "Hindi",
+      "English"
+    ],
+    "available_dates": [
+      "2026-11-03",
+      "2026-11-04",
+      "2026-11-06"
+    ],
+    "available_time_slots": [
+      "09:30 AM",
+      "11:00 AM",
+      "02:30 PM",
+      "04:00 PM"
+    ]
+  },
+  {
+    "doctor_id": "DOC004",
+    "name": "Dr. Sunita Rao",
+    "specialization": "Pediatrics",
+    "qualification": "MBBS, DCH, MD (Pediatrics)",
+    "experience_years": 15,
+    "department_id": "DEP-PED",
+    "consultation_fee": 700,
+    "room_number": "Room 304, Block A",
+    "languages": [
+      "Hindi",
+      "English",
+      "Telugu"
+    ],
+    "available_dates": [
+      "2026-11-02",
+      "2026-11-03",
+      "2026-11-05"
+    ],
+    "available_time_slots": [
+      "10:00 AM",
+      "11:30 AM",
+      "01:30 PM",
+      "03:30 PM"
+    ]
+  }
+]

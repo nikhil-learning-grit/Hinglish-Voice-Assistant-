@@ -1,0 +1,209 @@
+{
+  "hospital_id": "HOSP001",
+  "name": "Sanjeevani Multispeciality Hospital",
+  "tagline": "Healthcare with Care & Compassion",
+  "contact": {
+    "phone": "+91-11-2659-4000",
+    "emergency_helpline": "+91-11-2659-4099",
+    "toll_free": "1800-11-4000",
+    "email": "helpdesk@sanjeevanihospital.in",
+    "website": "https://www.sanjeevanihospital.in"
+  },
+  "location": {
+    "building": "Main Campus, Building A & B",
+    "street": "Plot 14, Institutional Area, Sector 5",
+    "area": "Dwarka",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "postal_code": "110075",
+    "country": "India",
+    "landmark": "Near Dwarka Sector 11 Metro Station"
+  },
+  "operating_hours": {
+    "opd": {
+      "days": "Monday - Saturday",
+      "open_time": "08:00 AM",
+      "close_time": "08:00 PM",
+      "note": "Sunday closed for routine OPD consultations"
+    },
+    "emergency": {
+      "days": "All 7 Days",
+      "hours": "24 Hours / 7 Days",
+      "note": "Trauma & Emergency care is always open"
+    },
+    "pharmacy": {
+      "days": "All 7 Days",
+      "hours": "24 Hours / 7 Days",
+      "note": "Located on Ground Floor next to Emergency"
+    },
+    "diagnostic_lab": {
+      "days": "Monday - Sunday",
+      "open_time": "07:00 AM",
+      "close_time": "09:00 PM",
+      "note": "Home sample collection available upon request"
+    },
+    "visiting_hours": {
+      "general_ward": "04:00 PM - 07:00 PM",
+      "icu": "11:00 AM - 12:00 PM and 05:00 PM - 06:00 PM"
+    }
+  },
+  "departments": [
+    {
+      "id": "DEP-GEN",
+      "name": "General Medicine",
+      "code": "general_medicine",
+      "description": "Primary care, fever, chronic disease management (diabetes, hypertension), and routine health checkups.",
+      "floor": "1st Floor, Block A"
+    },
+    {
+      "id": "DEP-CARD",
+      "name": "Cardiology",
+      "code": "cardiology",
+      "description": "Comprehensive cardiac care, ECG, echocardiography, hypertension, and preventive heart screening.",
+      "floor": "2nd Floor, Block B"
+    },
+    {
+      "id": "DEP-ORTH",
+      "name": "Orthopedics",
+      "code": "orthopedics",
+      "description": "Bone, joint, spine disorders, sports injuries, arthritis, and fracture trauma management.",
+      "floor": "1st Floor, Block B"
+    },
+    {
+      "id": "DEP-PED",
+      "name": "Pediatrics",
+      "code": "pediatrics",
+      "description": "Neonatal care, infant care, pediatric immunization, and adolescent health management.",
+      "floor": "3rd Floor, Block A"
+    },
+    {
+      "id": "DEP-DERM",
+      "name": "Dermatology",
+      "code": "dermatology",
+      "description": "Skin, hair, nail treatments, cosmetic dermatology, and allergy diagnosis.",
+      "floor": "3rd Floor, Block B"
+    }
+  ],
+  "appointment_policies": {
+    "booking_window_days": 7,
+    "cancellation_notice_hours": 2,
+    "reschedule_limit_per_booking": 2,
+    "check_in_advance_minutes": 15,
+    "late_arrival_grace_minutes": 10,
+    "consultation_fee_modes": [
+      "Cash at billing counter",
+      "UPI (GPay / PhonePe / Paytm)",
+      "Credit / Debit Card",
+      "Net Banking"
+    ],
+    "id_proof_required": true,
+    "accepted_id_proofs": [
+      "Aadhaar Card",
+      "Voter ID",
+      "Passport",
+      "Driving License"
+    ],
+    "walk_in_allowed": true,
+    "walk_in_note": "Walk-in tokens are subject to doctor slot availability and may have longer wait times."
+  },
+  "faqs": [
+    {
+      "id": "FAQ-001",
+      "question": "What are the OPD timings?",
+      "question_hinglish": "OPD ka timing kya hai?",
+      "answer": "Our Outpatient Department (OPD) operates Monday through Saturday from 08:00 AM to 08:00 PM. Emergency services remain open 24/7.",
+      "answer_hinglish": "Humara OPD Monday se Saturday subah 8:00 baje se raat 8:00 baje tak khula rehta hai. Emergency services 24 ghante uplabdh hain.",
+      "category": "timings",
+      "keywords": [
+        "opd",
+        "timing",
+        "hours",
+        "open",
+        "samay",
+        "khula",
+        "close"
+      ]
+    },
+    {
+      "id": "FAQ-002",
+      "question": "How can I book an appointment?",
+      "question_hinglish": "Appointment kaise book kar sakte hain?",
+      "answer": "You can book an appointment using this voice assistant, through our website, or by calling our helpdesk at +91-11-2659-4000.",
+      "answer_hinglish": "Aap is voice assistant ke zariye, humari website par jakar, ya helpdesk number +91-11-2659-4000 par call karke appointment book kar sakte hain.",
+      "category": "booking",
+      "keywords": [
+        "book",
+        "appointment",
+        "booking",
+        "schedule",
+        "milna",
+        "doctor"
+      ]
+    },
+    {
+      "id": "FAQ-003",
+      "question": "Can I cancel or reschedule my appointment?",
+      "question_hinglish": "Kya main appointment cancel ya reschedule kar sakta hoon?",
+      "answer": "Yes, appointments can be cancelled or rescheduled at least 2 hours before the scheduled time slot without any penalty.",
+      "answer_hinglish": "Haan, aap scheduled time se kam se kam 2 ghante pehle appointment bina kisi charge ke cancel ya reschedule kar sakte hain.",
+      "category": "cancellation",
+      "keywords": [
+        "cancel",
+        "reschedule",
+        "radd",
+        "change time",
+        "badalna",
+        "postpone"
+      ]
+    },
+    {
+      "id": "FAQ-004",
+      "question": "Where is the hospital located?",
+      "question_hinglish": "Hospital kahan par sthit hai?",
+      "answer": "Sanjeevani Multispeciality Hospital is located at Plot 14, Institutional Area, Sector 5, Dwarka, New Delhi 110075, near Dwarka Sector 11 Metro Station.",
+      "answer_hinglish": "Hospital Plot 14, Institutional Area, Sector 5, Dwarka, New Delhi 110075 mein sthit hai, Dwarka Sector 11 Metro Station ke paas.",
+      "category": "location",
+      "keywords": [
+        "location",
+        "address",
+        "pata",
+        "kahan",
+        "metro",
+        "directions",
+        "where"
+      ]
+    },
+    {
+      "id": "FAQ-005",
+      "question": "What documents should I bring for my consultation?",
+      "question_hinglish": "Doctor ke paas aate waqt kaunse documents laane honge?",
+      "answer": "Please carry a valid government-issued photo ID (such as Aadhaar or Voter ID), any prior medical reports, and current prescriptions.",
+      "answer_hinglish": "Kripya ek valid photo ID (jaise Aadhaar ya Voter ID), purani medical reports, aur chalu dawaiyon ki prescription saath layein.",
+      "category": "checkin",
+      "keywords": [
+        "documents",
+        "reports",
+        "kya lana hai",
+        "id proof",
+        "prescription",
+        "files"
+      ]
+    },
+    {
+      "id": "FAQ-006",
+      "question": "Are emergency services available at night?",
+      "question_hinglish": "Kya raat ko emergency services chalu rehti hain?",
+      "answer": "Yes, our Emergency and Trauma Care unit is fully operational 24 hours a day, 7 days a week, with dedicated on-call doctors and ambulance support.",
+      "answer_hinglish": "Ji haan, humari Emergency aur Trauma unit 24 ghante aur saaton din khuli rehti hai, ambulance aur emergency doctors ke saath.",
+      "category": "emergency",
+      "keywords": [
+        "emergency",
+        "night",
+        "raat",
+        "urgent",
+        "ambulance",
+        "casualty"
+      ]
+    }
+  ]
+}

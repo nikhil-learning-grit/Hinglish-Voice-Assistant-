@@ -1,0 +1,182 @@
+[
+  {
+    "appointment_id": "APT-1001",
+    "doctor_id": "DOC001",
+    "doctor_name": "Dr. Rajesh Sharma",
+    "specialization": "General Medicine",
+    "date": "2026-11-02",
+    "time_slot": "09:00 AM",
+    "status": "booked",
+    "patient": {
+      "patient_id": "PAT-901",
+      "name": "Rohan Verma",
+      "phone": "+91-98765-43210",
+      "gender": "Male",
+      "age": 34
+    },
+    "reason_for_visit": "Persistent high fever and throat irritation",
+    "booking_timestamp": "2026-10-30T10:15:00+05:30",
+    "consultation_fee": 600
+  },
+  {
+    "appointment_id": "APT-1002",
+    "doctor_id": "DOC001",
+    "doctor_name": "Dr. Rajesh Sharma",
+    "specialization": "General Medicine",
+    "date": "2026-11-02",
+    "time_slot": "10:00 AM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 600
+  },
+  {
+    "appointment_id": "APT-1003",
+    "doctor_id": "DOC001",
+    "doctor_name": "Dr. Rajesh Sharma",
+    "specialization": "General Medicine",
+    "date": "2026-11-03",
+    "time_slot": "11:30 AM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 600
+  },
+  {
+    "appointment_id": "APT-1004",
+    "doctor_id": "DOC002",
+    "doctor_name": "Dr. Priya Patel",
+    "specialization": "Cardiology",
+    "date": "2026-11-02",
+    "time_slot": "10:30 AM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 1000
+  },
+  {
+    "appointment_id": "APT-1005",
+    "doctor_id": "DOC002",
+    "doctor_name": "Dr. Priya Patel",
+    "specialization": "Cardiology",
+    "date": "2026-11-02",
+    "time_slot": "12:00 PM",
+    "status": "booked",
+    "patient": {
+      "patient_id": "PAT-902",
+      "name": "Meera Joshi",
+      "phone": "+91-98111-22334",
+      "gender": "Female",
+      "age": 52
+    },
+    "reason_for_visit": "Hypertension routine checkup and ECG review",
+    "booking_timestamp": "2026-10-30T14:45:00+05:30",
+    "consultation_fee": 1000
+  },
+  {
+    "appointment_id": "APT-1006",
+    "doctor_id": "DOC002",
+    "doctor_name": "Dr. Priya Patel",
+    "specialization": "Cardiology",
+    "date": "2026-11-04",
+    "time_slot": "03:00 PM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 1000
+  },
+  {
+    "appointment_id": "APT-1007",
+    "doctor_id": "DOC003",
+    "doctor_name": "Dr. Amit Verma",
+    "specialization": "Orthopedics",
+    "date": "2026-11-03",
+    "time_slot": "09:30 AM",
+    "status": "booked",
+    "patient": {
+      "patient_id": "PAT-903",
+      "name": "Vikram Malhotra",
+      "phone": "+91-98222-33445",
+      "gender": "Male",
+      "age": 41
+    },
+    "reason_for_visit": "Right knee joint pain and swelling",
+    "booking_timestamp": "2026-10-31T09:00:00+05:30",
+    "consultation_fee": 800
+  },
+  {
+    "appointment_id": "APT-1008",
+    "doctor_id": "DOC003",
+    "doctor_name": "Dr. Amit Verma",
+    "specialization": "Orthopedics",
+    "date": "2026-11-03",
+    "time_slot": "11:00 AM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 800
+  },
+  {
+    "appointment_id": "APT-1009",
+    "doctor_id": "DOC003",
+    "doctor_name": "Dr. Amit Verma",
+    "specialization": "Orthopedics",
+    "date": "2026-11-04",
+    "time_slot": "02:30 PM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 800
+  },
+  {
+    "appointment_id": "APT-1010",
+    "doctor_id": "DOC004",
+    "doctor_name": "Dr. Sunita Rao",
+    "specialization": "Pediatrics",
+    "date": "2026-11-02",
+    "time_slot": "10:00 AM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 700
+  },
+  {
+    "appointment_id": "APT-1011",
+    "doctor_id": "DOC004",
+    "doctor_name": "Dr. Sunita Rao",
+    "specialization": "Pediatrics",
+    "date": "2026-11-03",
+    "time_slot": "11:30 AM",
+    "status": "booked",
+    "patient": {
+      "patient_id": "PAT-904",
+      "name": "Aarav Gupta",
+      "phone": "+91-98333-44556",
+      "gender": "Male",
+      "age": 5
+    },
+    "reason_for_visit": "MMR booster vaccination and general pediatric checkup",
+    "booking_timestamp": "2026-10-31T11:20:00+05:30",
+    "consultation_fee": 700
+  },
+  {
+    "appointment_id": "APT-1012",
+    "doctor_id": "DOC004",
+    "doctor_name": "Dr. Sunita Rao",
+    "specialization": "Pediatrics",
+    "date": "2026-11-05",
+    "time_slot": "01:30 PM",
+    "status": "available",
+    "patient": null,
+    "reason_for_visit": null,
+    "booking_timestamp": null,
+    "consultation_fee": 700
+  }
+]
