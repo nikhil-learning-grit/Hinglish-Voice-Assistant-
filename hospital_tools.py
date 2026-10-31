@@ -1,11 +1,12 @@
 # hospital_tools.py
-"""Utility module for the Hinglish Voice Assistant.
+"""Utility module for the Hinglish Voice Assistant (Midnight Phantom Hotline).
 Provides robust, deterministic access to hospital information and
-appointment management using the mock JSON data in the data/ directory.
+appointment management using mock JSON datasets and the curated MEDIQ FAQ dataset.
 """
 
 import json
 import os
+import re
 import threading
 import uuid
 from datetime import datetime
@@ -23,6 +24,7 @@ _BOOKING_LOCK = threading.Lock()
 _hospital_data: Optional[Dict[str, Any]] = None
 _doctors_data: Optional[List[Dict[str, Any]]] = None
 _appointments_data: Optional[List[Dict[str, Any]]] = None
+_enhanced_faq_data: Optional[List[Dict[str, Any]]] = None
 
 
 def _load_json(file_name: str) -> Any:
@@ -36,13 +38,18 @@ def _load_json(file_name: str) -> Any:
 
 def _ensure_data_loaded(force_reload: bool = False) -> None:
     """Populate the module-level caches if empty or if force_reload is True."""
-    global _hospital_data, _doctors_data, _appointments_data
+    global _hospital_data, _doctors_data, _appointments_data, _enhanced_faq_data
     if force_reload or _hospital_data is None:
         _hospital_data = _load_json("hospital.json")
     if force_reload or _doctors_data is None:
         _doctors_data = _load_json("doctors.json")
     if force_reload or _appointments_data is None:
         _appointments_data = _load_json("appointments.json")
+    if force_reload or _enhanced_faq_data is None:
+        try:
+            _enhanced_faq_data = _load_json("enhanced_hospital_faq.json")
+        except FileNotFoundError:
+            _enhanced_faq_data = []
 
 
 def reload_data() -> None:
@@ -68,6 +75,50 @@ def _save_appointments() -> bool:
         return False
 
 
+def _match_enhanced_faq(topic_clean: str) -> List[Dict[str, Any]]:
+    """Dynamically match a query against the curated MEDIQ enhanced FAQ dataset."""
+    if not _enhanced_faq_data:
+        return []
+
+    query_tokens = [w for w in re.findall(r"\w+", topic_clean.lower()) if len(w) > 2]
+    if not query_tokens:
+        return []
+
+    scored_matches = []
+    q_tokens_set = set(query_tokens)
+
+    for item in _enhanced_faq_data:
+        q_item = item.get("question", "").lower()
+        if not q_item:
+            continue
+
+        # Exact phrase substring match (user query contained in question)
+        if topic_clean in q_item and len(topic_clean) >= 4:
+            scored_matches.append((10.0, item))
+            continue
+
+        item_tokens = set(re.findall(r"\w+", q_item))
+        common = q_tokens_set.intersection(item_tokens)
+
+        # Multi-word queries must match at least 2 tokens and >= 67% of query tokens
+        if len(query_tokens) >= 2:
+            if len(common) >= 2 and (len(common) / len(query_tokens)) >= 0.67:
+                score = len(common) / len(query_tokens)
+                scored_matches.append((score, item))
+        elif len(query_tokens) == 1:
+            if len(common) == 1:
+                # Single-token queries must match a valid topic tag or keyword in the item
+                tag = str(item.get("ai_topic_tags", "")).lower()
+                if query_tokens[0] in tag or query_tokens[0] in item_tokens:
+                    scored_matches.append((1.0, item))
+
+    if not scored_matches:
+        return []
+
+    scored_matches.sort(key=lambda x: x[0], reverse=True)
+    return [m[1] for m in scored_matches[:5]]
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -82,7 +133,7 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
       - 'faqs': Complete list of frequently asked questions
       - 'contact': Phone, email, emergency helpline
       - 'policies': Appointment and visit policies
-      - Specific FAQ queries or keywords (e.g., 'OPD timings', 'emergency at night')
+      - Specific queries matching MEDIQ enhanced hospital FAQ dataset
 
     Returns a structured dictionary:
       {"success": bool, "message": str, "data": Any}
@@ -98,7 +149,7 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
 
     topic_clean = topic.strip().lower()
 
-    # Direct top-level topic mapping
+    # 1. Direct top-level topic mapping
     topic_map = {
         "departments": _hospital_data.get("departments"),
         "department": _hospital_data.get("departments"),
@@ -125,7 +176,7 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
             "data": topic_map[topic_clean],
         }
 
-    # Search through FAQs for matching questions or keywords
+    # 2. Search through hospital.json FAQs
     faqs = _hospital_data.get("faqs", [])
     matched_faqs = []
     for faq in faqs:
@@ -148,7 +199,19 @@ def get_hospital_information(topic: str) -> Dict[str, Any]:
             "data": matched_faqs if len(matched_faqs) > 1 else matched_faqs[0],
         }
 
-    # Safe fallback response without hallucinations
+    # 3. Dynamic search in enhanced hospital FAQ dataset (derived from MEDIQ)
+    enhanced_matches = _match_enhanced_faq(topic_clean)
+    if enhanced_matches:
+        return {
+            "success": True,
+            "message": (
+                f"Found {len(enhanced_matches)} matching administrative record(s) "
+                f"for '{topic.strip()}' in hospital knowledge base."
+            ),
+            "data": enhanced_matches if len(enhanced_matches) > 1 else enhanced_matches[0],
+        }
+
+    # 4. Safe fallback response without hallucinations
     return {
         "success": False,
         "message": (

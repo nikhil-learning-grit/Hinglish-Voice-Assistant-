@@ -83,6 +83,19 @@ class TestHospitalTools(unittest.TestCase):
             self.assertTrue(res["success"], f"Query failed to find FAQ: {query}")
             self.assertIsNotNone(res["data"])
 
+    def test_get_hospital_information_enhanced_dataset_matching(self):
+        """Test that administrative and appointment queries match against enhanced MEDIQ FAQ dataset."""
+        queries = [
+            "where is opd in kgmu",
+            "Opd ki timings kya hai",
+            "appointment lena hai cardiology me"
+        ]
+        for query in queries:
+            res = get_hospital_information(query)
+            self.assertTrue(res["success"], f"Query failed to find enhanced FAQ match: {query}")
+            self.assertIsNotNone(res["data"])
+            self.assertIsInstance(res["message"], str)
+
     def test_get_hospital_information_unknown_topic_safe_response(self):
         """Unknown or nonsensical topics return a safe response without crashing or hallucinating."""
         queries = [
