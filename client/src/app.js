@@ -1,96 +1,177 @@
 import { PipecatClient, RTVIEvent } from '@pipecat-ai/client-js';
 import {
-  AVAILABLE_TRANSPORTS,
   DEFAULT_TRANSPORT,
   PROJECT_NAME,
   TRANSPORT_CONFIG,
   createTransport,
 } from './config';
 
-class VoiceChatClient {
+class HotlineVoiceClient {
   constructor() {
     this.client = null;
     this.transportType = DEFAULT_TRANSPORT;
     this.isConnected = false;
     this.audioElement = null;
 
+    // Real-time Audio Analyser for organic ripple effects
+    this.audioContext = null;
+    this.analyser = null;
+    this.audioSourceNode = null;
+    this.animFrameId = null;
+
+    // Latency & State Tracking
+    this.currentState = 'idle';
+    this.userSpeechEndTime = null;
+    this.llmStartTime = null;
+    this.botSpeechStartTime = null;
+
     this.setupDOM();
     this.setupEventListeners();
-    this.addEvent('initialized', 'Client initialized');
   }
 
   setupDOM() {
-    document.title = PROJECT_NAME;
-    document.getElementById('title').textContent = PROJECT_NAME;
-    this.transportSelect = document.getElementById('transport-select');
-    this.connectBtn = document.getElementById('connect-btn');
-    this.micBtn = document.getElementById('mic-btn');
-    this.micStatus = document.getElementById('mic-status');
-    this.conversationLog = document.getElementById('conversation-log');
-    this.eventsLog = document.getElementById('events-log');
+    document.title = PROJECT_NAME ? `${PROJECT_NAME} — AI Reception` : 'Midnight Phantom Hotline — AI Reception';
 
-    // Populate transport selector with available transports
-    this.transportSelect.innerHTML = '';
-    AVAILABLE_TRANSPORTS.forEach((transport) => {
-      const option = document.createElement('option');
-      option.value = transport;
-      option.textContent =
-        transport.charAt(0).toUpperCase() + transport.slice(1);
-      if (transport === 'smallwebrtc') {
-        option.textContent = 'SmallWebRTC';
-      } else if (transport === 'daily') {
-        option.textContent = 'Daily';
-      } else if (transport === 'livekit') {
-        option.textContent = 'LiveKit';
-      } else if (transport === 'websocket') {
-        option.textContent = 'WebSocket';
-      }
-      this.transportSelect.appendChild(option);
-    });
+    // Header elements
+    this.statusBadge = document.getElementById('status-badge');
+    this.badgeText = document.getElementById('badge-text');
+    this.latStt = document.getElementById('lat-stt');
+    this.latLlm = document.getElementById('lat-llm');
+    this.latTts = document.getElementById('lat-tts');
+    this.latE2e = document.getElementById('lat-e2e');
 
-    // Hide transport selector if only one transport
-    if (AVAILABLE_TRANSPORTS.length === 1) {
-      this.transportSelect.hidden = true;
-    }
+    // Central Stage elements
+    this.boundary = document.getElementById('visualizer-boundary');
+    this.mainMicBtn = document.getElementById('main-mic-btn');
+    this.iconActive = document.getElementById('icon-mic-active');
+    this.iconMuted = document.getElementById('icon-mic-muted');
+    this.subPrompt = document.getElementById('sub-prompt');
 
-    // Add placeholder message
-    this.addConversationMessage(
-      'Connect to start talking with your bot',
-      'placeholder',
-    );
+    // Auxiliary controls
+    this.btnMute = document.getElementById('btn-mute');
+    this.muteLabel = document.getElementById('mute-label');
+    this.btnReset = document.getElementById('btn-reset');
+    this.btnDisconnect = document.getElementById('btn-disconnect');
+
+    this.setSystemState('idle', 'Tap to start speaking');
   }
 
   setupEventListeners() {
-    this.transportSelect.addEventListener('change', (e) => {
-      this.transportType = e.target.value;
-      this.addEvent('transport-changed', this.transportType);
+    // 1. Central Neumorphic Microphone Button - toggle capture & connect
+    this.mainMicBtn.addEventListener('click', () => {
+      if (!this.isConnected) {
+        this.connect();
+      } else if (this.client) {
+        this.toggleMic();
+      }
     });
 
-    this.connectBtn.addEventListener('click', () => {
+    // 2. Auxiliary Mute Button
+    this.btnMute.addEventListener('click', () => {
+      if (this.isConnected && this.client) {
+        this.toggleMic();
+      }
+    });
+
+    // 3. Auxiliary Reset Session Button
+    this.btnReset.addEventListener('click', () => {
+      if (this.isConnected && this.client) {
+        this.resetSession();
+      }
+    });
+
+    // 4. Auxiliary End Call Button
+    this.btnDisconnect.addEventListener('click', () => {
       if (this.isConnected) {
         this.disconnect();
-      } else {
-        this.connect();
       }
     });
+  }
 
-    this.micBtn.addEventListener('click', () => {
-      if (this.client) {
-        const newState = !this.client.isMicEnabled;
-        this.client.enableMic(newState);
-        this.updateMicButton(newState);
+  toggleMic() {
+    if (!this.client) return;
+    const newState = !this.client.isMicEnabled;
+    this.client.enableMic(newState);
+    this.updateMicVisuals(newState);
+  }
+
+  updateMicVisuals(isMicEnabled) {
+    if (isMicEnabled) {
+      this.iconActive.classList.remove('hidden');
+      this.iconMuted.classList.add('hidden');
+      this.btnMute.classList.remove('active');
+      this.muteLabel.textContent = 'Mute Mic';
+      if (this.currentState === 'idle') {
+        this.setSystemState('idle', 'Listening for your query...');
       }
-    });
+    } else {
+      this.iconActive.classList.add('hidden');
+      this.iconMuted.classList.remove('hidden');
+      this.btnMute.classList.add('active');
+      this.muteLabel.textContent = 'Unmute Mic';
+      this.setSystemState('idle', 'Microphone paused. Tap to resume.');
+    }
+  }
+
+  setSystemState(state, captionText) {
+    this.currentState = state;
+
+    // Reset boundary classes
+    this.boundary.classList.remove(
+      'state-idle',
+      'state-user-speaking',
+      'state-bot-speaking'
+    );
+
+    // Reset badge classes
+    this.statusBadge.classList.remove(
+      'badge-ready',
+      'badge-connecting',
+      'badge-listening',
+      'badge-speaking'
+    );
+
+    switch (state) {
+      case 'listening':
+      case 'user-speaking':
+        this.boundary.classList.add('state-user-speaking');
+        this.statusBadge.classList.add('badge-listening');
+        this.badgeText.textContent = 'Listening...';
+        break;
+
+      case 'speaking':
+      case 'bot-speaking':
+        this.boundary.classList.add('state-bot-speaking');
+        this.statusBadge.classList.add('badge-speaking');
+        this.badgeText.textContent = 'Speaking...';
+        break;
+
+      case 'connecting':
+        this.boundary.classList.add('state-idle');
+        this.statusBadge.classList.add('badge-connecting');
+        this.badgeText.textContent = 'Connecting...';
+        break;
+
+      case 'idle':
+      default:
+        this.boundary.classList.add('state-idle');
+        this.statusBadge.classList.add('badge-ready');
+        this.badgeText.textContent = 'Ready';
+        break;
+    }
+
+    if (captionText) {
+      this.subPrompt.textContent = captionText;
+    }
   }
 
   async connect() {
     try {
-      this.addEvent('connecting', `Using ${this.transportType} transport`);
+      this.setSystemState('connecting', 'Connecting to Sanjeevani Reception...');
+      this.mainMicBtn.disabled = true;
 
-      // Create transport using config
       const transport = await createTransport(this.transportType);
 
-      // Create client
       this.client = new PipecatClient({
         transport,
         enableMic: true,
@@ -103,39 +184,64 @@ class VoiceChatClient {
             this.onDisconnected();
           },
           onTransportStateChanged: (state) => {
-            this.addEvent('transport-state', state);
+            console.log('Transport state changed:', state);
           },
           onBotReady: () => {
-            this.addEvent('bot-ready', 'Bot is ready to talk');
+            this.setSystemState('idle', 'Ready — ask anything in Hindi or English');
           },
-          onBotLlmStarted: () => this.addEvent('thinking', 'Assistant is preparing a response'),
-          onBotStartedSpeaking: () => this.addEvent('speaking', 'Assistant is speaking'),
-          onBotStoppedSpeaking: () => this.addEvent('speaking', 'Assistant finished speaking'),
-          onUserStartedSpeaking: () => this.addEvent('listening', 'Microphone audio detected'),
-          onUserTranscript: (data) => {
-            if (data.final) {
-              this.addConversationMessage(data.text, 'user');
+          onUserStartedSpeaking: () => {
+            this.userSpeechEndTime = null;
+            this.setSystemState('user-speaking', 'Listening to you...');
+          },
+          onUserStoppedSpeaking: () => {
+            this.userSpeechEndTime = Date.now();
+            if (this.isConnected && this.currentState === 'user-speaking') {
+              this.setSystemState('idle', 'Thinking...');
             }
           },
-          onBotTranscript: (data) => {
-            this.addConversationMessage(data.text, 'bot');
+          onUserTranscript: (data) => {
+            if (data?.final && this.userSpeechEndTime) {
+              const sttMs = Math.max(1, Date.now() - this.userSpeechEndTime);
+              this.latStt.textContent = `${sttMs} ms`;
+            }
+          },
+          onBotLlmStarted: () => {
+            this.llmStartTime = Date.now();
+            this.setSystemState('idle', 'Thinking...');
+          },
+          onBotStartedSpeaking: () => {
+            const now = Date.now();
+            this.botSpeechStartTime = now;
+
+            if (this.llmStartTime) {
+              const llmMs = Math.max(1, now - this.llmStartTime);
+              this.latLlm.textContent = `${llmMs} ms`;
+            }
+
+            if (this.userSpeechEndTime) {
+              const e2eMs = Math.max(1, now - this.userSpeechEndTime);
+              this.latE2e.textContent = `${e2eMs} ms`;
+            }
+
+            this.setSystemState('bot-speaking', 'Sanjeevani Reception is speaking...');
+          },
+          onBotStoppedSpeaking: () => {
+            if (this.isConnected) {
+              this.setSystemState('idle', 'Ready — ask your next question');
+            }
           },
           onError: (error) => {
-            const message = error?.message || error?.data?.message || JSON.stringify(error);
-            this.addEvent('error', message);
-            this.addConversationMessage(`Connection error: ${message}`, 'error');
+            const msg = error?.message || String(error);
+            console.error('Voice stream error:', msg);
+            this.setSystemState('idle', `Error: ${msg}`);
           },
         },
       });
 
-      // Setup audio
       this.setupAudio();
 
-      // Start bot and connect using config
       const connectParams = TRANSPORT_CONFIG[this.transportType];
       if (this.transportType === 'websocket') {
-        // WebSocket connects in two steps: start the bot to obtain the
-        // WebSocket URL (and optional token), then connect to it.
         const { wsUrl, token } = await this.client.startBot(connectParams);
         await this.client.connect({
           wsUrl: token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl,
@@ -143,25 +249,48 @@ class VoiceChatClient {
       } else {
         await this.client.startBotAndConnect(connectParams);
       }
-    } catch (error) {
-      const message = error?.message || String(error);
-      this.addEvent('error', message);
-      this.addConversationMessage(`Could not connect: ${message}`, 'error');
-      console.error('Connection error:', error);
+    } catch (err) {
+      const msg = err?.message || String(err);
+      console.error('Connection failed:', err);
+      this.setSystemState('idle', `Connection failed: ${msg}`);
+      this.mainMicBtn.disabled = false;
     }
   }
 
   async disconnect() {
     if (this.client) {
-      await this.client.disconnect();
+      try {
+        await this.client.disconnect();
+      } catch (err) {
+        console.warn('Disconnect error:', err);
+      }
       this.client = null;
     }
+    this.onDisconnected();
+  }
+
+  async resetSession() {
+    this.setSystemState('connecting', 'Reconnecting session...');
+    if (this.client) {
+      try {
+        await this.client.disconnect();
+      } catch (err) {
+        console.warn('Reset error:', err);
+      }
+      this.client = null;
+    }
+    await this.connect();
   }
 
   setupAudio() {
     this.client.on(RTVIEvent.TrackStarted, (track, participant) => {
       if (!participant?.local && track.kind === 'audio') {
-        this.addEvent('track-started', 'Bot audio track');
+        const ttsStart = Date.now();
+        if (this.botSpeechStartTime) {
+          const ttsMs = Math.max(1, ttsStart - this.botSpeechStartTime);
+          this.latTts.textContent = `${ttsMs} ms`;
+        }
+
         if (!this.audioElement) {
           this.audioElement = document.createElement('audio');
           this.audioElement.autoplay = true;
@@ -169,101 +298,108 @@ class VoiceChatClient {
           document.body.appendChild(this.audioElement);
         }
         this.audioElement.srcObject = new MediaStream([track]);
-        this.audioElement.play().catch((error) => {
-          this.addEvent('audio-playback-error', error.message);
+        this.audioElement.play().catch((err) => {
+          console.warn('Playback request error:', err);
         });
+
+        this.attachAudioVisualizer(track);
       }
     });
   }
 
+  attachAudioVisualizer(mediaStreamTrack) {
+    try {
+      if (!this.audioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new AudioCtx();
+      }
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
+
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 64;
+      this.analyser.smoothingTimeConstant = 0.8;
+
+      const stream = new MediaStream([mediaStreamTrack]);
+      this.audioSourceNode = this.audioContext.createMediaStreamSource(stream);
+      this.audioSourceNode.connect(this.analyser);
+
+      this.startVisualizerLoop();
+    } catch (err) {
+      console.warn('Audio visualizer analyser attachment:', err);
+    }
+  }
+
+  startVisualizerLoop() {
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+    }
+
+    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+
+    const renderPulse = () => {
+      if (this.analyser && this.currentState === 'bot-speaking') {
+        this.analyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / dataArray.length;
+        const normalized = Math.min(avg / 128, 1);
+
+        // Fluid organic scale wave based on real vocal audio
+        const scale = 1 + normalized * 0.18;
+        this.boundary.style.transform = `scale(${scale.toFixed(3)})`;
+      } else if (this.currentState !== 'user-speaking') {
+        this.boundary.style.transform = '';
+      }
+
+      this.animFrameId = requestAnimationFrame(renderPulse);
+    };
+
+    renderPulse();
+  }
+
   onConnected() {
     this.isConnected = true;
-    this.connectBtn.textContent = 'Disconnect';
-    this.connectBtn.classList.add('disconnect');
-    this.micBtn.disabled = false;
-    this.transportSelect.disabled = true;
-    this.updateMicButton(this.client.isMicEnabled);
-    this.addEvent('connected', 'Successfully connected to bot');
+    this.mainMicBtn.disabled = false;
+    this.btnMute.disabled = false;
+    this.btnReset.disabled = false;
+    this.btnDisconnect.disabled = false;
 
-    // Clear placeholder
-    if (this.conversationLog.querySelector('.placeholder')) {
-      this.conversationLog.innerHTML = '';
-    }
+    this.updateMicVisuals(this.client.isMicEnabled);
+    this.setSystemState('idle', 'Ready — ask anything in Hindi or English');
   }
 
   onDisconnected() {
     this.isConnected = false;
-    this.connectBtn.textContent = 'Connect';
-    this.connectBtn.classList.remove('disconnect');
-    this.micBtn.disabled = true;
-    this.transportSelect.disabled = false;
-    this.updateMicButton(false);
-    this.addEvent('disconnected', 'Disconnected from bot');
-  }
+    this.mainMicBtn.disabled = false;
+    this.btnMute.disabled = true;
+    this.btnReset.disabled = true;
+    this.btnDisconnect.disabled = true;
 
-  updateMicButton(enabled) {
-    this.micStatus.textContent = enabled ? 'Mic on' : 'Mic off';
-    this.micBtn.classList.toggle('on', enabled);
-  }
+    this.updateMicVisuals(true);
+    this.setSystemState('idle', 'Tap to start speaking');
 
-  addConversationMessage(text, role) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `conversation-message ${role}`;
+    // Reset latency metrics
+    this.latStt.textContent = '-- ms';
+    this.latLlm.textContent = '-- ms';
+    this.latTts.textContent = '-- ms';
+    this.latE2e.textContent = '-- ms';
 
-    if (role === 'placeholder') {
-      messageDiv.textContent = text;
-    } else if (role === 'error') {
-      messageDiv.textContent = text;
-    } else {
-      const roleSpan = document.createElement('div');
-      roleSpan.className = 'role';
-      roleSpan.textContent = role === 'user' ? 'You' : 'Bot';
-
-      const textDiv = document.createElement('div');
-      textDiv.textContent = text;
-
-      messageDiv.appendChild(roleSpan);
-      messageDiv.appendChild(textDiv);
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
     }
-
-    this.conversationLog.appendChild(messageDiv);
-    this.conversationLog.scrollTop = this.conversationLog.scrollHeight;
-  }
-
-  addEvent(eventName, data) {
-    const eventDiv = document.createElement('div');
-    eventDiv.className = 'event-entry';
-
-    const timestamp = new Date().toLocaleTimeString(undefined, {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      fractionalSecondDigits: 3,
-    });
-    const timestampSpan = document.createElement('span');
-    timestampSpan.className = 'timestamp';
-    timestampSpan.textContent = timestamp;
-
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'event-name';
-    nameSpan.textContent = eventName;
-
-    const dataSpan = document.createElement('span');
-    dataSpan.className = 'event-data';
-    dataSpan.textContent =
-      typeof data === 'string' ? data : JSON.stringify(data);
-
-    eventDiv.appendChild(timestampSpan);
-    eventDiv.appendChild(nameSpan);
-    eventDiv.appendChild(dataSpan);
-
-    this.eventsLog.appendChild(eventDiv);
-    this.eventsLog.scrollTop = this.eventsLog.scrollHeight;
+    if (this.boundary) {
+      this.boundary.style.transform = '';
+    }
   }
 }
 
-// Initialize when DOM is loaded
+// Bootstrap when DOM content is ready
 window.addEventListener('DOMContentLoaded', () => {
-  new VoiceChatClient();
+  new HotlineVoiceClient();
 });

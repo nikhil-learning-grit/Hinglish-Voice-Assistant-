@@ -4,48 +4,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="light dark" />
-  <title>Pipecat Bot</title>
+  <meta name="color-scheme" content="light" />
+  <title>Midnight Phantom Hotline — AI Reception</title>
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 
-<body>
-  <div class="app">
-    <header class="header">
+<body class="theme-light">
+  <!-- Subtle warm ambient lighting backdrop -->
+  <div class="ambient-backdrop"></div>
+
+  <div class="app-layout">
+    <!-- Clean Minimalist Header -->
+    <header class="app-header">
       <div class="header-brand">
-        <span class="header-logo" aria-label="Pipecat" role="img">
-          <svg width="35" height="20" viewBox="0 0 45 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M6.19825 0.104287C6.83144 -0.13411 7.5461 0.044779 7.99232 0.553371L13.8037 7.17714H31.1545L36.9659 0.553371C37.4121 0.044779 38.1268 -0.13411 38.76 0.104287C39.3932 0.342685 39.8124 0.948477 39.8124 1.62507V16.25H44.9582V19.5H36.5624V5.94116L33.112 9.87383C32.8035 10.2255 32.3584 10.4271 31.8905 10.4271H13.0677C12.5998 10.4271 12.1547 10.2255 11.8462 9.87383L8.39581 5.94116V19.5H0V16.25H5.14582V1.62507C5.14582 0.948477 5.56505 0.342685 6.19825 0.104287Z" fill="currentColor" />
-            <path d="M36.5624 22.75H44.9582V26H36.5624V22.75Z" fill="currentColor" />
-            <path d="M0 22.75H8.39581V26H0V22.75Z" fill="currentColor" />
-            <path d="M17.3333 17.3334C17.3333 18.53 16.3632 19.5 15.1666 19.5C13.97 19.5 13 18.53 13 17.3334C13 16.1367 13.97 15.1667 15.1666 15.1667C16.3632 15.1667 17.3333 16.1367 17.3333 17.3334Z" fill="currentColor" />
-            <path d="M31.9582 17.3334C31.9582 18.53 30.9882 19.5 29.7916 19.5C28.595 19.5 27.6249 18.53 27.6249 17.3334C27.6249 16.1367 28.595 15.1667 29.7916 15.1667C30.9882 15.1667 31.9582 16.1367 31.9582 17.3334Z" fill="currentColor" />
+        <div class="brand-avatar">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
           </svg>
-        </span>
-        <h1 id="title" class="header-title">Pipecat Bot</h1>
+        </div>
+        <div>
+          <h1 class="header-title">Midnight Phantom Hotline</h1>
+          <p class="header-subtitle">Sanjeevani Multispeciality Hospital</p>
+        </div>
       </div>
-      <div class="header-controls">
-        <select id="transport-select" class="control" aria-label="Transport">
-          <option value="smallwebrtc">SmallWebRTC</option>
-          <option value="daily">Daily</option>
-        </select>
-        <button id="mic-btn" class="control mic-btn" disabled>
-          <span id="mic-status">Mic off</span>
-        </button>
-        <button id="connect-btn" class="control connect-btn">Connect</button>
+
+      <div class="header-center">
+        <!-- Soft Status Pill Badge -->
+        <div id="status-badge" class="status-badge badge-ready">
+          <span class="badge-dot"></span>
+          <span id="badge-text" class="badge-text">Ready</span>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <!-- Latency Metrics Pill -->
+        <div class="latency-card">
+          <div class="latency-metric">
+            <span class="metric-tag">STT</span>
+            <span id="lat-stt" class="metric-val">-- ms</span>
+          </div>
+          <span class="metric-divider"></span>
+          <div class="latency-metric">
+            <span class="metric-tag">LLM</span>
+            <span id="lat-llm" class="metric-val">-- ms</span>
+          </div>
+          <span class="metric-divider"></span>
+          <div class="latency-metric">
+            <span class="metric-tag">TTS</span>
+            <span id="lat-tts" class="metric-val">-- ms</span>
+          </div>
+          <span class="metric-divider"></span>
+          <div class="latency-metric metric-e2e">
+            <span class="metric-tag">E2E</span>
+            <span id="lat-e2e" class="metric-val">-- ms</span>
+          </div>
+        </div>
       </div>
     </header>
 
-    <main class="main">
-      <section class="panel conversation-panel">
-        <h2 class="panel-title">Conversation</h2>
-        <div id="conversation-log" class="panel-content"></div>
-      </section>
+    <!-- Center Interactive Stage -->
+    <main class="app-main">
+      <div class="stage-center">
+        <!-- Organic Fluid Glow Boundary -->
+        <div id="visualizer-boundary" class="visualizer-boundary state-idle">
+          <div class="organic-wave wave-3"></div>
+          <div class="organic-wave wave-2"></div>
+          <div class="organic-wave wave-1"></div>
 
-      <section class="panel events-panel">
-        <h2 class="panel-title">Events</h2>
-        <div id="events-log" class="panel-content"></div>
-      </section>
+          <!-- Tactile Soft-Neumorphic Center Microphone Button -->
+          <button id="main-mic-btn" class="main-mic-btn" aria-label="Start Voice Conversation">
+            <div class="btn-inner-depth">
+              <div class="mic-icon-box">
+                <svg id="icon-mic-active" class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="22"></line>
+                  <line x1="8" y1="22" x2="16" y2="22"></line>
+                </svg>
+                <svg id="icon-mic-muted" class="mic-svg hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                  <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.94-.6"></path>
+                  <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                  <line x1="12" y1="19" x2="12" y2="22"></line>
+                  <line x1="8" y1="22" x2="16" y2="22"></line>
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Human-Centered Caption & Micro-copy -->
+        <div class="prompt-container">
+          <p id="sub-prompt" class="sub-prompt">Tap to start speaking</p>
+          <span class="sub-caption">Speaks Hindi, English, and Hinglish</span>
+        </div>
+      </div>
+
+      <!-- Human-Crafted Auxiliary Controls Row -->
+      <footer class="controls-container">
+        <button id="btn-mute" class="action-btn btn-mute" disabled>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+            <line x1="8" y1="22" x2="16" y2="22"></line>
+          </svg>
+          <span id="mute-label">Mute Mic</span>
+        </button>
+
+        <button id="btn-reset" class="action-btn btn-reset" disabled>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Reset Session</span>
+        </button>
+
+        <button id="btn-disconnect" class="action-btn btn-disconnect" disabled>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path>
+            <line x1="23" y1="1" x2="1" y2="23"></line>
+          </svg>
+          <span>End Call</span>
+        </button>
+      </footer>
     </main>
   </div>
 
